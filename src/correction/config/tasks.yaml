@@ -1,0 +1,280 @@
+
+ocr_parser_task:
+  description: >
+    Parse the two OCR JSON files {ocr1} and {ocr2} and extract relevant data.
+    From the first JSON {ocr1}, extract the complete `words` list.
+    From the second JSON {ocr2}, extract the `text` string.
+    Normalize both for comparison by stripping punctuation, normalizing spaces, and lowercasing.
+  expected_output: >
+    A normalized list of words from both OCR outputs {ocr1} and {ocr2} ready for comparison.
+  agent: parser_agent
+
+ocr_comparison_task:
+  description: >
+    Compare the normalized word sequences from both OCR engines {ocr1} and {ocr2}.
+    Flag words that:
+      1. Differ meaningfully between the two outputs (ignoring case and spacing),
+      2. Contain alphanumeric characters (e.g., '0rder2') but not proper numbers like '123' or dates like '2023-10-01'.
+    Ignore:
+      - Capitalization differences (e.g., 'Present' vs 'present'),
+      - Word spacing variations,
+      - Punctuation mismatches,
+      - Misspellings that are identical in both OCRs,
+      - Misspellings that are highly similar based on fuzzy string matching (e.g., 'sustify' vs 'sastify'),
+      - Word omissions that do not change overall meaning.
+  expected_output: >
+    A list of words flagged as OCR errors with rule-based justifications and indices.
+  agent: comparison_agent
+
+
+ocr_logging_task:
+  description: >
+    Log all discrepancies identified as OCR errors from the comparison task between {ocr1} and {ocr2}.
+    Each log entry must contain:
+      - The original word from both OCR outputs {ocr1} and {ocr2},
+      - The index or position in the sequence (if possible),
+      - The specific rule that was triggered,
+      - A short justification.
+  expected_output: >
+    A structured log of flagged OCR errors suitable for review or debugging.
+  agent: logger_agent
+
+ocr_report_task:
+  description: >
+    Generate a structured JSON report containing:
+      - The full OCR1 text as "text",
+      - A "flagged_words" list with details about each flagged word,
+    For each flagged word, include:
+      - The word itself,
+      - The index in the sequence,
+      - The original representations from both OCRs,
+      - The rule that was triggered,
+      - A clear justification.
+  expected_output: >
+    {
+      "text": "<Full reconstructed text from OCR1>",
+      "flagged_words": [
+        {
+          "word": "<flagged word>",
+          "index": <word position in sequence>,
+          "ocr1": "<word from OCR1>",
+          "ocr2": "<word from OCR2>",
+          "rule_triggered": "<rule name>",
+          "justification": "<why the word was flagged>"
+        },
+        ...
+      ]
+    }
+  agent: report_agent
+
+
+
+final_output_task:
+  description: >
+    Given the original sentence "text" and a list of flagged words "flagged_words" (with OCR1/OCR2 tokens, rules, and justifications),
+    return :
+    1. flagged_words_corrected_text: where ONLY the flagged words are replaced with contextually appropriate corrections, leaving all other words untouched.
+
+    You must preserve the structure and meaning of the original sentence in both cases.
+  
+    input will be the  text and flagged_words from the report_agent
+  expected_output: >
+    {
+      "flagged_words_corrected_text": "<The sentence where only flagged words are corrected>"
+    }
+
+  agent: final_corrector_agent
+
+
+
+
+# ocr_parser_task:
+#   description: >
+#     Parse OCR JSON files {ocr1} and {ocr2}.
+#     For each:
+#     1. Normalize text:
+#       - Lowercase all characters,
+#       - Remove punctuation (.,!?),
+#       - Normalize whitespace,
+#       - Output as array of words.
+#     2. Extract MCQs:
+#       - Group text into MCQ blocks using flexible pattern recognition,
+#       - Support options labeled as: A, A), (A), A., 1., or even misrecognized labels like “4” instead of “A”,
+#       - Use heuristics to infer questions and options when formatting is inconsistent,
+#       - Include MCQs even if answer is missing (set `"answer": null`),
+#       - Normalize options to keys “A” through “D”, if fewer, leave blanks.
+#   expected_output: >
+#     {
+#       "normalized_text_ocr1": [...],
+#       "normalized_text_ocr2": [...],
+#       "mcqs_ocr1": [
+#         {
+#           "question": "...",
+#           "options": { "A": "...", "B": "...", "C": "...", "D": "..." },
+#           "answer": "B"  # or null
+#         },
+#         ...
+#       ],
+#       "mcqs_ocr2": [ {...}, ... ]
+#     }
+#   agent: parser_agent
+
+# ocr_parser_task:
+#   description: >
+#     Parse OCR JSON files {ocr1} and {ocr2} into structured components:
+    
+#     1. **Text Extraction**:
+#       - Extract all text blocks and normalize:
+#         - Lowercase all characters,
+#         - Strip punctuation (.,!?() etc.),
+#         - Normalize whitespace (convert multiple spaces/tabs to single space),
+#         - Tokenize into words (output a word array per OCR source).
+
+#     2. **MCQ Identification**:
+#       - Detect MCQ blocks using flexible pattern recognition, not rigid formatting.
+#       - Accept question blocks like:
+#         - "1. What is X?"
+#         - "Q: What is X?"
+#         - Or standalone lines ending in "?" followed by options.
+#       - Detect answer choices using varied styles:
+#         - "A)", "(A)", "A.", "a)", "a.", "1."
+#       - Handle broken line wraps, e.g., an option on the next line.
+#       - Accept MCQs **even without answers** (set `"answer": null`).
+
+#     3. **Boundary Control**:
+#       - When identifying MCQs, isolate them from normal paragraph text using:
+#         - Heuristics (e.g., 4 options in short succession),
+#         - Presence of a question mark followed by label patterns.
+
+#     **DONT CHANGE ANY CONTENT IN THE TEXT
+
+#     Ensure:
+#       - All narrative text **not part of an MCQ** remains in `normalized_text`,
+#       - All potential MCQs are attempted, even with fuzzy or broken formatting.
+
+#   expected_output: >
+#     {
+#       "normalized_text_ocr1": [ "this", "is", "some", "intro", "text", "..." ],
+#       "normalized_text_ocr2": [ "this", "is", "some", "intro", "text", "..." ],
+#       "mcqs_ocr1": [
+#         {
+#           "question": "What is 2 + 2?",
+#           "options": {
+#             "A": "One",
+#             "B": "Two",
+#             "C": "Three",
+#             "D": "Four"
+#           },
+#           "answer": "D"
+#         },
+#         ...
+#       ],
+#       "mcqs_ocr2": [ {...}, ... ]
+#     }
+#   agent: parser_agent
+
+
+# ocr_comparison_task:
+#   description: >
+#     Compare normalized word arrays and MCQs between {ocr1} and {ocr2}.
+#     For text comparison:
+#       - Use fuzzy matching (Levenshtein similarity >= 0.85) to detect discrepancies,
+#       - Flag token mismatches, insertions, deletions.
+#     For MCQ comparison:
+#       - Match questions using fuzzy logic,
+#       - Check option label alignment (A matches A),
+#       - Detect differences in option text, missing or duplicate labels, misrecognized characters (e.g., “O” instead of “D”),
+#       - Flag if answers differ or if one OCR is missing an MCQ.
+      
+#       **DONT CHANGE ANY CONTENT IN THE TEXT
+#   expected_output: >
+#     {
+#       "flagged_words": [ "..." ],
+#       "flagged_mcqs": [
+#         {
+#           "question": "...",
+#           "issue": "Option label mismatch / Missing answer / Option text mismatch / Question not matched",
+#           "ocr1": { "question": "...", "options": { ... }, "answer": "..." },
+#           "ocr2": { "question": "...", "options": { ... }, "answer": "..." },
+#           "justification": "..."
+#         },
+#         ...
+#       ]
+#     }
+#   agent: comparison_agent
+
+# ocr_logging_task:
+#   description: >
+#     Log all flagged OCR inconsistencies from the previous comparison step.
+#     For text:
+#       - List word, index (position), rule violated, and justification.
+#     For MCQs:
+#       - List question, affected option labels, mismatch type (label mismatch, missing option, incorrect answer), and justification.
+#     The output must be structured for later analysis or debugging.
+
+#     **DONT CHANGE ANY CONTENT IN THE TEXT
+#   expected_output: >
+#     {
+#       "text_issues": [
+#         { "word": "...", "position": 42, "rule": "punctuation mismatch", "justification": "..." }
+#       ],
+#       "mcq_issues": [
+#         {
+#           "question": "...",
+#           "affected_options": ["A", "C"],
+#           "type": "Option text mismatch",
+#           "justification": "..."
+#         }
+#       ]
+#     }
+#   agent: logger_agent
+
+# ocr_report_task:
+#   description: >
+#     Generate a final structured JSON report based on outputs from parsing and comparison.
+#     Must include:
+#     - The fully reconstructed normalized OCR1 text,
+#     - All flagged text differences,
+#     - All flagged MCQ issues with justification and side-by-side comparison.
+#     **DONT CHANGE ANY CONTENT IN THE TEXT
+#   expected_output: >
+#     {
+#       "text": "...",
+#       "flagged_words": [
+#         { "word": "...", "index": 42, "ocr1": "...", "ocr2": "...", "rule_triggered": "...", "justification": "..." }
+#       ],
+#       "flagged_mcqs": [
+#         {
+#           "question": "...",
+#           "ocr1": { "question": "...", "options": { ... }, "answer": "..." },
+#           "ocr2": { "question": "...", "options": { ... }, "answer": "..." },
+#           "issue": "Option mismatch / Missing answer / Duplicate label",
+#           "justification": "..."
+#         }
+#       ]
+#     }
+#   agent: report_agent
+
+# final_output_task:
+#   description: >
+#     Based on flagged words and MCQs, apply corrections to:
+#     - Original OCR1 text by replacing flagged words with closest correct equivalents (OCR2 or fuzzy-corrected),
+#     - MCQs: Fix mismatched options (restore A–D), insert missing options, correct wrong answers.
+#     Maintain structure. **Do not alter non-flagged content.
+
+#     **DONT CHANGE ANY CONTENT IN THE TEXT
+#   expected_output: >
+#     {
+#       "flagged_words_corrected_text": "...",
+#       "corrected_mcqs": [
+#         {
+#           "question": "...",
+#           "options": { "A": "...", "B": "...", "C": "...", "D": "..." },
+#           "answer": "B"
+#         },
+#         ...
+#       ]
+#     }
+#   agent: final_corrector_agent
+
+

@@ -1,0 +1,44 @@
+```json
+{
+  "ocr_corrected_text": "ANSWER SHEET SRI SAI SRI SAI HIGH SCHOOL GOLIVARI STREET, PERALA - 523 157 Name - Del Ich. Prem Kumar Roll No. 24 MARKS: X PERALA Class Subject Social Date 28-4-25 Examination: S.T. Invigilator Signature: 28/4/25 1A, Everything available in our environment which can be used to satisfy our need provided technologically accessible, economically feasible, culturally accepted can be termed as resources. 2A, Jharkhand, Chhattisgarh, Madhya Pradesh 3A, Brundtland Commission report. 4A, 3.28 million sq km 5A, In present the total geographical is about 130 million hectares degraded land is in India IT GA11, These resources regulated by the International Institution 2) Example the oceanic resources beyond 200 km exclusive economic zones are the country individual utilize the country by the international institutions are examples of these international resources TIT JA, The following features of the arid soil are: 1) The color of the arid soil ranges red to brown 2) These soils are generally in sandy in texture Saline in nature 3) The arid soils lack of humus and moisture because of high temperature and dry climate, and fast evaporation 4) These soils have lower part occupied by the Kankar because of high calcium content and it restricts the infiltration of water in lower layers. 8A The human resource is center of the development. 2, The resource becomes the resource only when we put by the human 3, In human which natural thing by the use of technology 4, It enhances the country constructs roads, Industries, power houses, Dams, bridges, are run these units, Teachers, scientists, are required 5, Human resource has an ample effect on the economy and society",
+  "ocr_corrections": [
+    "Ich. Frem Kumar → Ich. Prem Kumar",
+    "sastfiy → satisfy",
+    "accesible → accessible",
+    "fishedl → feasible",
+    "areisedel → accepted",
+    "commnisim → Commission",
+    "geopraphical → geographical",
+    "millon → million",
+    "exvicive → exclusive",
+    "econmic → economic",
+    "Instition → Institution",
+    "Instations → institutions",
+    "ocgenic → oceanic",
+    "exvicive → exclusive",
+    "countrays → country",
+    "ANGES → ranges",
+    "Q) → 2)",
+    "evoperation → evaporation",
+    "restrats → restricts",
+    "containt → content",
+    "brediges → bridges",
+    "economy → economy",
+    "socity → society"
+  ],
+  "might_be_student_errors": [
+    "teconology",
+    "sceintistes"
+  ],
+  "separated_answers": {
+    "question_1": "Everything available in our environment which can be used to satisfy our need provided technologically accessible, economically feasible, culturally accepted can be termed as resources.",
+    "question_2": "Jharkhand, Chhattisgarh, Madhya Pradesh",
+    "question_3": "Brundtland Commission report.",
+    "question_4": "3.28 million sq km",
+    "question_5": "In present the total geographical is about 130 million hectares degraded land is in India.",
+    "question_6": "These resources regulated by the International Institution. Example, the oceanic resources beyond 200 km exclusive economic zones are the country individual utilize the country by the international institutions are examples of these international resources.",
+    "question_7": "The following features of the arid soil are: 1) The color of the arid soil ranges red to brown 2) These soils are generally in sandy in texture, Saline in nature 3) The arid soils lack of humus and moisture because of high temperature and dry climate, and fast evaporation 4) These soils have lower part occupied by the Kankar because of high calcium content and it restricts the infiltration of water in lower layers.",
+    "question_8": "The human resource is center of the development. The resource becomes the resource only when we put by the human. In human which natural thing by the use of technology. It enhances the country constructs roads, Industries, power houses, Dams, bridges, are run these units, Teachers, scientists, are required. Human resource has an ample effect on the economy and society."
+  }
+}
+```
