@@ -1,0 +1,29 @@
+# Core dependencies
+Flask==2.3.3
+Flask-CORS==4.0.0
+requests==2.31.0
+
+# CrewAI and related dependencies (let pip resolve compatible versions)
+crewai[tools]>=0.28.0
+
+
+# Additional dependencies that might be needed by CrewAI
+pydantic>=2.7.0
+python-dotenv>=1.0.0
+openai>=1.35.0
+
+# Utility dependencies
+Werkzeug==2.3.7
+click>=8.1.0
+itsdangerous>=2.1.0
+Jinja2>=3.1.0
+MarkupSafe>=2.1.0
+
+# For JSON handling and datetime
+python-dateutil>=2.8.0
+
+# For better logging and error handling
+colorlog>=6.7.0
+
+# Optional: For production deployment
+gunicorn>=21.2.0
